@@ -288,3 +288,4 @@ fabric.properties
 
 !.idea/codeStyles
 !.idea/runConfigurations
+/web-app/.idea/
