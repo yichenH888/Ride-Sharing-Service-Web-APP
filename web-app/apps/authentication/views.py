@@ -1,7 +1,7 @@
 # Create your views here.
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from .forms import LoginForm, SignUpForm
 
@@ -44,9 +44,7 @@ def register_user(request):
             msg = 'User created successfully.'
             success = True
 
-            # return redirect("/login/")
-            print("Signup successful")
-            return HttpResponse("Signup successful")
+            return redirect("/login/")
         else:
             msg = form.errors
             print(form.errors)
