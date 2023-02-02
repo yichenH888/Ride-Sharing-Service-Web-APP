@@ -5,13 +5,13 @@ from django.shortcuts import render, redirect
 from django.template import loader
 
 
-@login_required(login_url="/login/")
+@login_required(login_url="/register/")
 def index(request):
     return render(request, "home/index.html", {'username': request.user.username})
     # return render(request, "layouts/sidebar.html", {'username': request.user.username})
 
 
-@login_required(login_url="/login/")
+@login_required(login_url="/register/")
 def pages(request):
     context = {}
     # All resource paths end in .html.
