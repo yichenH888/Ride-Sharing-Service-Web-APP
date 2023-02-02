@@ -1,0 +1,21 @@
+image: python:latest
+
+services:
+  - postgres:latest
+variables:
+  POSTGRES_DB: RideConnectDB
+  POSTGRES_HOST: postgres
+  POSTGRES_USER: RideConnect
+  POSTGRES_PASSWORD: "#O-H0s_c1Q=cHeG+KOKe"
+
+cache:
+  paths:
+    - ~/.cache/pip/
+
+before_script:
+  - python -V  # Print out python version for debugging
+  - pip install -r requirements.txt
+
+test:
+  script:
+    - python ~/web-app/manage.py check
