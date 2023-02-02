@@ -14,8 +14,8 @@ cache:
 
 before_script:
   - python -V  # Print out python version for debugging
-  - pip install -r ~/web-app/requirements.txt
+  - pip install -r web-app/requirements.txt
 
 test:
   script:
-    - python ~/web-app/manage.py check
+    - python web-app/manage.py check
