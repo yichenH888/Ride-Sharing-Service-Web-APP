@@ -11,14 +11,16 @@
     <main class="form-signin w-100 m-auto">
         <form method="post">
             {% csrf_token %}
-            <img class="mb-4" src="{{ ASSETS_ROOT }}/img/logo.png" alt="" width="72" height="57">
-            <h1 class="h3 mb-3 fw-normal">RideConnect</h1>
+            <div style="text-align: center;">
+                <img class="mb-4" src="{{ ASSETS_ROOT }}/img/logo.png" alt="" width="128" height="128">
+            </div>
+            <h1 class="h3 mb-3 fw-normal text-center text-white">RideConnect</h1>
 
-            <p class="mb-0">
+            <p class="mb-0 text-center">
                 {% if msg %}
                     <span class="text-danger">{{ msg | safe }}</span>
                 {% else %}
-                    Add your credentials
+                    Let's get you signed in!
                 {% endif %}
             </p>
 
@@ -33,13 +35,17 @@
                 <label for="floatingPassword">Password</label>
             </div>
 
-            <div class="checkbox mb-3">
+            <div class="checkbox mb-3 text-center">
                 <label>
                     <input type="checkbox" value="remember-me"> Remember me
                 </label>
             </div>
             <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-            <p class="mt-5 mb-3 text-muted">&copy; Rocco Su & Yichen Huang</p>
+            <p class="text-center mt-3 fw-bold">
+                Not a member yet?
+            </p>
+            <a href="{% url 'register' %}" class="w-100 btn btn-lg btn-secondary">Register here</a>
+            <p class="mt-5 mb-3 text-muted text-center">&copy; Rocco Su & Yichen Huang</p>
         </form>
     </main>
 
