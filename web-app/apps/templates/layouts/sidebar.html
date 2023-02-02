@@ -51,8 +51,11 @@
 
         <ul class="list-unstyled components">
             <p>
-                Welcome {{ username }} !
+                Welcome {{ user.username }} !
             </p>
+            <li>
+                <a href="/">Home</a>
+            </li>
             <li>
                 <a href="#">Ride request</a>
             </li>
@@ -63,7 +66,7 @@
                 <a href="#">Ride status</a>
             </li>
             <li>
-                <a href="#">Driver</a>
+                <a href="{% url 'driver_view' %}">Driver</a>
             </li>
             <li>
                 <a href="#">Portfolio</a>
@@ -108,7 +111,7 @@
             });
         });
     </script>
-
+</div>
 </body>
 
 </html>

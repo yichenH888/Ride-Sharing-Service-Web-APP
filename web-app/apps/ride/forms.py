@@ -10,9 +10,9 @@ class RideRequestForm(forms.ModelForm):
         fields = ['sharable',
                   'destination',
                   'arrive_time',
-                  'total_passenger',
+                  'total_passengers',
                   'vehicle_type',
-                  'other_request']
+                  'additional_requests']
 
 
 class RideUpdateForm(forms.ModelForm):
@@ -20,10 +20,10 @@ class RideUpdateForm(forms.ModelForm):
         model = Ride
         fields = ['sharable',
                   'destination',
-                  'arrival_time',
-                  'total_passenger',
+                  'arrive_time',
+                  'total_passengers',
                   'vehicle_type',
-                  'other_request']
+                  'additional_requests']
 
 
 class UserUpdateForm(forms.ModelForm):
@@ -38,7 +38,7 @@ class DriverRegisterForm(forms.ModelForm):
     class Meta:
         model = Driver
         fields = ['plate_number',
-                  'max_cap',
+                  'max_capacity',
                   'vehicle_type']
 
 
@@ -46,7 +46,7 @@ class DriverUpdateForm(forms.ModelForm):
     class Meta:
         model = Driver
         fields = ['plate_number',
-                  'max_cap',
+                  'max_capacity',
                   'vehicle_type']
 
 
@@ -54,6 +54,6 @@ class RideSearchForm(forms.ModelForm):
     class Meta:
         model = Ride
         fields = ['destination',
-                  'arrival_time',
+                  'arrive_time',
                   'vehicle_type',
-                  'total_passenger']
+                  'total_passengers']
