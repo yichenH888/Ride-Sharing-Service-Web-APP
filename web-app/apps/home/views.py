@@ -6,7 +6,6 @@ from django.shortcuts import render, redirect
 @login_required(login_url="/register/")
 def index(request):
     return render(request, "home/index.html")
-    # return render(request, "layouts/sidebar.html", {'username': request.user.username})
 
 
 @login_required(login_url="/register/")
