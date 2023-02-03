@@ -1,0 +1,70 @@
+{% extends 'layouts/sidebar.html' %}
+
+{% block title %} RideConnect - Driver {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="container mt-3">
+        <h2 class="text-primary">Ride list</h2>
+        <hr class="my-4">
+        <!-- Filter Form -->
+        <p class="text-secondary">List of all the rides, choose a status to filter.</p>
+        <form class="form-inline my-3">
+            <div class="form-group mr-3">
+                <select class="form-control" onchange="location = this.value;">
+                    <option value="{% url 'my_rides_view' %}?status=all">All</option>
+                    <option value="{% url 'my_rides_view' %}?status=open" {% if status == 'open' %}selected{% endif %}>
+                        Open
+                    </option>
+                    <option value="{% url 'my_rides_view' %}?status=confirmed"
+                            {% if status == 'confirmed' %}selected{% endif %}>Confirmed
+                    </option>
+                    <option value="{% url 'my_rides_view' %}?status=completed"
+                            {% if status == 'completed' %}selected{% endif %}>Completed
+                    </option>
+                    <option value="{% url 'my_rides_view' %}?status=canceled"
+                            {% if status == 'canceled' %}selected{% endif %}>
+                        Canceled
+                    </option>
+                </select>
+            </div>
+        </form>
+
+        <table class="table table-striped mt-3">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Owner</th>
+                <th>Driver</th>
+                <th>Sharable</th>
+                <th># of Sharer</th>
+                <th>Destination</th>
+                <th>Create Time</th>
+                <th>Arrive Time</th>
+                <th>Total Passengers</th>
+                <th>Vehicle Type</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ride in rides %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ ride.owner }}</td>
+                    <td>{{ ride.driver }}</td>
+                    <td>{{ ride.sharable }}</td>
+                    <td>{{ ride.sharers.count }}</td>
+                    <td>{{ ride.destination }}</td>
+                    <td>{{ ride.create_time }}</td>
+                    <td>{{ ride.arrive_time }}</td>
+                    <td>{{ ride.total_passengers }}</td>
+                    <td>{{ ride.vehicle_type }}</td>
+                    <td>{{ ride.status }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

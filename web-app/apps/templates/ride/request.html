@@ -1,0 +1,16 @@
+{% extends 'layouts/sidebar.html' %}
+
+{% block title %} RideConnect - Request {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <h2 class="text-primary">Request a ride</h2>
+    <hr class="my-4">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+{% endblock content %}

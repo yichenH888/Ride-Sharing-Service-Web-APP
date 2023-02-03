@@ -37,7 +37,7 @@ class Ride(models.Model):
     # Binding Users
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, null=True, related_name="driver")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner")
-    sharer = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="sharer")
+    sharers = models.ManyToManyField(User, related_name="sharer", blank=True)
     # Ride info
     sharable = models.BooleanField(default=True)
     destination = models.CharField(max_length=100)
