@@ -289,3 +289,6 @@ fabric.properties
 !.idea/codeStyles
 !.idea/runConfigurations
 /web-app/.idea/
+/web-app/apps/ride/migrations/
+/web-app/apps/home/migrations/
+/web-app/apps/authentication/migrations/
