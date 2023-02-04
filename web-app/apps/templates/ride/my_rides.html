@@ -1,6 +1,6 @@
 {% extends 'layouts/sidebar.html' %}
 
-{% block title %} RideConnect - Driver {% endblock title %}
+{% block title %} RideConnect - My Rides {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -50,7 +50,7 @@
             </thead>
             <tbody>
             {% for ride in rides %}
-                <tr>
+                <tr onclick="window.location='{% url 'ride_detail_view' ride.id %}'">
                     <td>{{ forloop.counter }}</td>
                     <td>{{ ride.owner }}</td>
                     <td>{{ ride.driver }}</td>

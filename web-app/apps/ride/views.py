@@ -1,7 +1,9 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.db.models import Q
+from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import DriverRegisterForm, DriverUpdateForm, RideRequestForm
+from .forms import DriverRegisterForm, DriverUpdateForm, RideRequestForm, RideUpdateForm
 from .models import Driver, Ride, RideStatusType
 
 
@@ -28,6 +30,7 @@ def driver_view(request):
             if 'cancel' in request.POST:
                 return redirect('driver_view')
             # Handle the 'unregister' button press
+            # todo)) change all confirmed rides to open
             if 'unregister' in request.POST:
                 driver.delete()
                 return redirect('driver_view')
@@ -67,7 +70,7 @@ def request_view(request):
             ride.status = 'open'
             ride.save()
             form.save_m2m()
-            return redirect('request_success_view')
+            return redirect('ride_request_success_view')
     else:
         form = RideRequestForm()
     return render(request, 'ride/request.html', {'form': form})
@@ -78,11 +81,16 @@ def request_success_view(request):
     return render(request, 'ride/request_success.html')
 
 
+@login_required(login_url="/register/")
 def my_rides_view(request):
     # Get the selected status from the query string
     status = request.GET.get('status')
-    # Get all rides by default
-    rides = Ride.objects.all()
+
+    driver = Driver.objects.filter(user=request.user).first()
+    # Get all rides related to user
+    rides = Ride.objects.filter(Q(owner=request.user) |
+                                Q(driver=driver) |
+                                Q(sharers=request.user))
     # Filter rides by status if the status is not "All"
     if status and status != 'all':
         rides = rides.filter(status=status)
@@ -93,16 +101,75 @@ def my_rides_view(request):
     }
     # Render the ride list template with the context
     return render(request, 'ride/my_rides.html', context)
-#
-# @login_required
-# def ride_update(request, pk):
-#     ride = Ride.objects.get(pk=pk)
-#     if request.method == 'POST':
-#         form = RideUpdateForm(request.POST, instance=ride)
-#         if form.is_valid():
-#             ride = form.save()
-#             return redirect('ride_list')
-#     else:
-#         form = RideUpdateForm(instance=ride)
-#     context = {'form': form, 'ride': ride}
-#     return render(request, 'rides/ride_update.html', context)
+
+
+@login_required(login_url="/register/")
+def detail_view(request, pk):
+    ride = get_object_or_404(Ride, pk=pk)
+
+    is_driver = Driver.objects.filter(user=request.user).exists()
+    is_owner = ride.owner == request.user
+    is_sharer = ride.sharers.contains(request.user)
+    has_sharer = bool(ride.sharers.exists())
+
+    show_driver_btn = is_driver and ride.status == RideStatusType.OPEN and not is_owner
+    show_owner_btn = is_owner and ride.status == RideStatusType.OPEN and not has_sharer
+    show_sharer_btn = is_sharer and ride.status == RideStatusType.OPEN
+    show_join_btn = not is_owner and not is_driver and ride.status == RideStatusType.OPEN and ride.sharable
+
+    return render(request, 'ride/detail.html', {'ride': ride,
+                                                'show_driver_btn': show_driver_btn,
+                                                'show_owner_btn': show_owner_btn,
+                                                'show_sharer_btn': show_sharer_btn,
+                                                'show_join_btn': show_join_btn})
+
+
+@login_required(login_url="/register/")
+def cancel_view(request, pk):
+    ride = get_object_or_404(Ride, pk=pk)
+    if ride.sharers.contains(request.user):
+        ride.sharers.remove(request.user)
+        ride.save()
+    elif ride:
+        ride.delete()
+        ride.save()
+    return render(request, 'ride/cancel.html')
+
+
+@login_required(login_url="/register/")
+def join_view(request, pk):
+    ride = get_object_or_404(Ride, pk=pk)
+    if ride:
+        ride.sharers.add(request.user)
+        ride.save()
+    return render(request, 'ride/join.html')
+
+
+@login_required(login_url="/register/")
+def confirm_view(request, pk):
+    # Get the current user's Driver instance
+    driver = Driver.objects.filter(user=request.user).first()
+    # get the ride object
+    ride = get_object_or_404(Ride, pk=pk)
+    # check if the user is a driver and the ride is open
+    if driver and ride.status == RideStatusType.OPEN:
+        # update the ride status and driver
+        ride.status = RideStatusType.CONFIRMED
+        ride.driver = driver
+        ride.save()
+        messages.success(request, 'Order confirmed!')
+    return redirect('ride_detail_view', pk=ride.pk)
+
+
+@login_required(login_url="/register/")
+def update_view(request, pk):
+    ride = get_object_or_404(Ride, pk=pk)
+
+    if request.method == "POST":
+        form = RideUpdateForm(request.POST, instance=ride)
+        if form.is_valid():
+            ride = form.save()
+            return redirect('ride_detail_view', pk=ride.pk)
+    else:
+        form = RideUpdateForm(instance=ride)
+    return render(request, 'ride/update.html', {'form': form})

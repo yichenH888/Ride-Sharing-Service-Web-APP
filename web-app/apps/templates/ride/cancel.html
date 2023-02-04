@@ -1,12 +1,12 @@
 {% extends 'layouts/sidebar.html' %}
 
-{% block title %} RideConnect - Request {% endblock title %}
+{% block title %} RideConnect - Cancel {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-    <h2>Ride Request Success</h2>
-    <p>Your ride request has been submitted successfully!</p>
+    <h2>Ride Cancel Success</h2>
+    <p>Your ride request has been canceled successfully!</p>
     <a class="btn btn-primary" href="{% url 'my_rides_view' %}">View your rides</a>
 {% endblock content %}

@@ -1,0 +1,89 @@
+{% extends 'layouts/sidebar.html' %}
+
+{% block title %} RideConnect - Detail {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="container my-5">
+        <h2 class="text-primary">Ride Detail</h2>
+        <hr class="my-4">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>Driver</th>
+                <td>{{ ride.driver }}</td>
+            </tr>
+            <tr>
+                <th>Owner</th>
+                <td>{{ ride.owner }}</td>
+            </tr>
+            <tr>
+                <th>Sharers</th>
+                <td>
+                    {% for sharer in ride.sharers.all %}
+                        {{ sharer }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <th>Sharable</th>
+                <td>{{ ride.sharable }}</td>
+            </tr>
+            <tr>
+                <th>Destination</th>
+                <td>{{ ride.destination }}</td>
+            </tr>
+            <tr>
+                <th>Create Time</th>
+                <td>{{ ride.create_time }}</td>
+            </tr>
+            <tr>
+                <th>Arrive Time</th>
+                <td>{{ ride.arrive_time }}</td>
+            </tr>
+            <tr>
+                <th>Total Passengers</th>
+                <td>{{ ride.total_passengers }}</td>
+            </tr>
+            <tr>
+                <th>Vehicle Type</th>
+                <td>{{ ride.vehicle_type }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ ride.status }}</td>
+            </tr>
+            <tr>
+                <th>Additional Requests</th>
+                <td>{{ ride.additional_requests }}</td>
+            </tr>
+            </tbody>
+        </table>
+
+        {% if show_driver_btn %}
+            <a class="btn btn-primary" href="{% url 'ride_confirm_view' pk=ride.pk %}">Confirm Ride</a>
+
+        {% elif show_owner_btn %}
+            <a class="btn btn-primary" href="{% url 'ride_update_view' pk=ride.pk %}">Update Ride</a>
+            <a class="btn btn-danger" href="{% url 'ride_cancel_view' pk=ride.pk %}">Cancel Ride</a>
+
+        {% elif show_sharer_btn %}
+            <a class="btn btn-danger" href="{% url 'ride_cancel_view' pk=ride.pk %}">Cancel Join</a>
+
+        {% elif show_join_btn %}
+            <a class="btn btn-primary" href="{% url 'ride_join_view' pk=ride.pk %}">Join Ride</a>
+        {% endif %}
+
+        <a class="btn btn-secondary" href="{% url 'my_rides_view' %}">Back to list</a>
+
+    </div>
+{% endblock content %}

@@ -30,7 +30,7 @@ class Driver(models.Model):
                                     default=VehicleType.SEDAN)
 
     def __str__(self):
-        return self.plate_number
+        return self.user.username
 
 
 class Ride(models.Model):
@@ -44,7 +44,7 @@ class Ride(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     arrive_time = models.DateTimeField(default=timezone.now)
     total_passengers = models.PositiveIntegerField(default=1)
-    vehicle_type = models.CharField(max_length=100, blank=True, choices=VehicleType.choices,
+    vehicle_type = models.CharField(max_length=100, blank=False, choices=VehicleType.choices,
                                     default=VehicleType.SEDAN)
     status = models.CharField(max_length=100, choices=RideStatusType.choices, default=RideStatusType.OPEN)
     additional_requests = models.CharField(max_length=200, blank=True)
