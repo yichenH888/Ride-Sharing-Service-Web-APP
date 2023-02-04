@@ -6,7 +6,13 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-    <h2>Ride Share Join Success</h2>
-    <p>Your ride share join request has been submitted successfully!</p>
-    <a class="btn btn-primary" href="{% url 'my_rides_view' %}">View your rides</a>
+    <h2 class="text-primary">Join a Ride</h2>
+    <hr class="my-4">
+    <form method="post">
+        {% csrf_token %}
+        <p class="text-secondary">How many people will join this ride?</p>
+        <input type="number" name="passenger_count" value="{{ passenger_count }}" min="1">
+        <input type="submit" class="btn btn-primary" value="Submit">
+        <a class="btn btn-secondary" href="{% url 'my_rides_view' %}">Cancel</a>
+    </form>
 {% endblock content %}

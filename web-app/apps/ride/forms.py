@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from .models import Driver, Ride
+from .models import Driver, Ride, RideShare
 
 
 class RideRequestForm(forms.ModelForm):
@@ -10,7 +10,7 @@ class RideRequestForm(forms.ModelForm):
         fields = ['sharable',
                   'destination',
                   'arrive_time',
-                  'total_passengers',
+                  'passengers_count',
                   'vehicle_type',
                   'additional_requests']
 
@@ -21,7 +21,7 @@ class RideUpdateForm(forms.ModelForm):
         fields = ['sharable',
                   'destination',
                   'arrive_time',
-                  'total_passengers',
+                  'passengers_count',
                   'vehicle_type',
                   'additional_requests']
 
@@ -56,4 +56,10 @@ class RideSearchForm(forms.ModelForm):
         fields = ['destination',
                   'arrive_time',
                   'vehicle_type',
-                  'total_passengers']
+                  'passengers_count']
+
+
+class RideJoinForm(forms.ModelForm):
+    class Meta:
+        model = RideShare
+        fields = ['passenger_count']

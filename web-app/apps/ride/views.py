@@ -1,10 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import DriverRegisterForm, DriverUpdateForm, RideRequestForm, RideUpdateForm
-from .models import Driver, Ride, RideStatusType
+from .models import Driver, Ride, RideStatusType, RideShare
 
 
 @login_required(login_url="/register/")
@@ -85,12 +84,17 @@ def request_success_view(request):
 def my_rides_view(request):
     # Get the selected status from the query string
     status = request.GET.get('status')
-
     driver = Driver.objects.filter(user=request.user).first()
+
     # Get all rides related to user
-    rides = Ride.objects.filter(Q(owner=request.user) |
-                                Q(driver=driver) |
-                                Q(sharers=request.user))
+    sharerides = RideShare.objects.filter(sharer=request.user)
+    # [debug]
+    rides = Ride.objects.all()
+    # rides = Ride.objects.filter(Q(owner=request.user) |
+    #                             Q(driver=driver) |
+    #                             Q(rideshare__in=sharerides))
+
+    # rides += sharerides
     # Filter rides by status if the status is not "All"
     if status and status != 'all':
         rides = rides.filter(status=status)
@@ -108,22 +112,37 @@ def detail_view(request, pk):
     ride = get_object_or_404(Ride, pk=pk)
 
     is_driver = Driver.objects.filter(user=request.user).exists()
-    is_owner = ride.owner == request.user
-    is_sharer = ride.sharers.contains(request.user)
-    has_sharer = bool(ride.sharers.exists())
+    is_driver_for_this_ride = ride.driver == request.user
+    is_owner_for_this_ride = ride.owner == request.user
+    is_sharer_for_this_ride = RideShare.objects.filter(ride=ride, sharer=request.user).exists()
+    has_sharer = bool(RideShare.objects.filter(ride=ride))
+    sharers = RideShare.objects.filter(ride=ride)
 
-    show_driver_btn = is_driver and ride.status == RideStatusType.OPEN and not is_owner
-    show_owner_btn = is_owner and ride.status == RideStatusType.OPEN and not has_sharer
-    show_sharer_btn = is_sharer and ride.status == RideStatusType.OPEN
-    show_join_btn = not is_owner and not is_driver and ride.status == RideStatusType.OPEN and ride.sharable
+    show_driver_btn = is_driver \
+                      and not is_driver_for_this_ride \
+                      and ride.status == RideStatusType.OPEN \
+                      and not is_owner_for_this_ride \
+                      and not is_sharer_for_this_ride
+    show_owner_btn = is_owner_for_this_ride \
+                     and ride.status == RideStatusType.OPEN \
+                     and not has_sharer
+    show_sharer_btn = is_sharer_for_this_ride \
+                      and ride.status == RideStatusType.OPEN
+    show_join_btn = not is_owner_for_this_ride \
+                    and not is_driver_for_this_ride \
+                    and ride.status == RideStatusType.OPEN \
+                    and ride.sharable \
+                    and not is_sharer_for_this_ride
 
     return render(request, 'ride/detail.html', {'ride': ride,
+                                                'sharers': sharers,
                                                 'show_driver_btn': show_driver_btn,
                                                 'show_owner_btn': show_owner_btn,
                                                 'show_sharer_btn': show_sharer_btn,
                                                 'show_join_btn': show_join_btn})
 
 
+# todo)) fix ride.sharers -> RideShare
 @login_required(login_url="/register/")
 def cancel_view(request, pk):
     ride = get_object_or_404(Ride, pk=pk)
@@ -139,10 +158,23 @@ def cancel_view(request, pk):
 @login_required(login_url="/register/")
 def join_view(request, pk):
     ride = get_object_or_404(Ride, pk=pk)
-    if ride:
-        ride.sharers.add(request.user)
-        ride.save()
-    return render(request, 'ride/join.html')
+    passenger_count = RideShare.objects.filter(ride=ride,
+                                               sharer=request.user).first().passenger_count if RideShare.objects.filter(
+        ride=ride, sharer=request.user).exists() else 1
+
+    if request.method == 'POST':
+        ride.add_sharer(request.user, request.POST.get('passenger_count'))
+        return redirect('ride_join_success_view')
+    # else:
+    #     exist_rideshare = RideShare.objects.filter(ride=ride, sharer=request.user).first()
+    #     if exist_rideshare:
+    #         passenger_count = exist_rideshare.passenger_count
+    return render(request, 'ride/join.html', {'passenger_count': passenger_count})
+
+
+@login_required(login_url="/register/")
+def join_success_view(request):
+    return render(request, 'ride/join_success.html')
 
 
 @login_required(login_url="/register/")
@@ -152,6 +184,7 @@ def confirm_view(request, pk):
     # get the ride object
     ride = get_object_or_404(Ride, pk=pk)
     # check if the user is a driver and the ride is open
+    # todo)) check the number of passenger is satisfied
     if driver and ride.status == RideStatusType.OPEN:
         # update the ride status and driver
         ride.status = RideStatusType.CONFIRMED

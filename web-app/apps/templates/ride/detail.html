@@ -29,8 +29,8 @@
             <tr>
                 <th>Sharers</th>
                 <td>
-                    {% for sharer in ride.sharers.all %}
-                        {{ sharer }}{% if not forloop.last %}, {% endif %}
+                    {% for sharer in sharers %}
+                        {{ sharer.sharer.username }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </td>
             </tr>
@@ -71,15 +71,16 @@
 
         {% if show_driver_btn %}
             <a class="btn btn-primary" href="{% url 'ride_confirm_view' pk=ride.pk %}">Confirm Ride</a>
-
-        {% elif show_owner_btn %}
+        {% endif %}
+        {% if show_owner_btn %}
             <a class="btn btn-primary" href="{% url 'ride_update_view' pk=ride.pk %}">Update Ride</a>
             <a class="btn btn-danger" href="{% url 'ride_cancel_view' pk=ride.pk %}">Cancel Ride</a>
-
-        {% elif show_sharer_btn %}
+        {% endif %}
+        {% if show_sharer_btn %}
+            <a class="btn btn-primary" href="{% url 'ride_join_view' pk=ride.pk %}">Update Join</a>
             <a class="btn btn-danger" href="{% url 'ride_cancel_view' pk=ride.pk %}">Cancel Join</a>
-
-        {% elif show_join_btn %}
+        {% endif %}
+        {% if show_join_btn %}
             <a class="btn btn-primary" href="{% url 'ride_join_view' pk=ride.pk %}">Join Ride</a>
         {% endif %}
 

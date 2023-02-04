@@ -1,0 +1,12 @@
+{% extends 'layouts/sidebar.html' %}
+
+{% block title %} RideConnect - Request {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <h2>Ride Join Request Success</h2>
+    <p>Your ride join request has been submitted successfully!</p>
+    <a class="btn btn-primary" href="{% url 'my_rides_view' %}">View your rides</a>
+{% endblock content %}
