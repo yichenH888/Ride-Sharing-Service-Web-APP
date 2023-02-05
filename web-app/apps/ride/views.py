@@ -131,7 +131,9 @@ def detail_view(request, pk):
     ride = get_object_or_404(Ride, pk=pk)
 
     is_driver = Driver.objects.filter(user=request.user).exists()
-    is_driver_for_this_ride = ride.driver.user == request.user
+    is_driver_for_this_ride = False
+    if ride.driver and ride.driver.user == request.user:
+        is_driver_for_this_ride = True
     is_owner_for_this_ride = ride.owner == request.user
     is_sharer_for_this_ride = RideShare.objects.filter(ride=ride, sharer=request.user).exists()
     has_sharer = bool(RideShare.objects.filter(ride=ride))
@@ -174,7 +176,7 @@ def complete_view(request, pk):
     sharer_emails = [sharer.user.email for sharer in RideShare.objects.filter(ride=ride)]
     recipient_list = [ride.owner, ride.driver] + sharer_emails
     send_email(SUBJECT_RIDE_COMPLETED,
-               get_completed_body(request.user, ride),
+               get_completed_body(ride),
                recipient_list)
     return redirect('ride_detail_view', pk=ride.pk)
 
