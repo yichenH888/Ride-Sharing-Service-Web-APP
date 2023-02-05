@@ -46,8 +46,8 @@ def get_canceled_body(user, ride):
            f"RideConnect"
 
 
-def get_join_body(name, ride, sharer):
-    return f"Dear {name},\n" \
+def get_joined_body(user, ride, sharer):
+    return f"Dear {user.username},\n" \
            f"\n" \
            f"A new sharer, {sharer.username}, has joined your ride.\n" \
            f"Ride Information: \n" \

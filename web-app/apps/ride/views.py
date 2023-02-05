@@ -6,7 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import DriverRegisterForm, DriverUpdateForm, RideRequestForm, RideUpdateForm
 from .models import Driver, Ride, RideStatusType, RideShare
 from .utils import send_email, SUBJECT_RIDE_CANCELED, get_canceled_body, SUBJECT_RIDE_CONFIRMED, SUBJECT_RIDE_JOINED, \
-    SUBJECT_RIDE_COMPLETED, get_completed_body, SUBJECT_RIDE_CHANGED, get_changed_body
+    SUBJECT_RIDE_COMPLETED, get_completed_body, SUBJECT_RIDE_CHANGED, get_changed_body, get_joined_body, \
+    get_confirmed_body
 
 
 def unregister_driver_helper(driver):
@@ -85,6 +86,7 @@ def request_view(request):
             ride = form.save(commit=False)
             ride.owner = request.user
             ride.status = 'open'
+            ride.update_total_passengers()
             ride.save()
             form.save_m2m()
             return redirect('ride_request_success_view')
@@ -104,11 +106,10 @@ def my_rides_view(request):
     status = request.GET.get('status')
 
     # Get all rides related to user
-    driver = Driver.objects.filter(user=request.user).first()
     sharerides = RideShare.objects.filter(sharer=request.user)
     rides = Ride.objects.filter(Q(owner=request.user) |
-                                Q(driver=driver) |
-                                Q(rideshare__in=sharerides))
+                                Q(driver__user=request.user) |
+                                Q(rideshare__in=sharerides)).distinct()
 
     # [debug] Show all the rides
     # rides = Ride.objects.all()
@@ -130,7 +131,7 @@ def detail_view(request, pk):
     ride = get_object_or_404(Ride, pk=pk)
 
     is_driver = Driver.objects.filter(user=request.user).exists()
-    is_driver_for_this_ride = ride.driver == request.user
+    is_driver_for_this_ride = ride.driver.user == request.user
     is_owner_for_this_ride = ride.owner == request.user
     is_sharer_for_this_ride = RideShare.objects.filter(ride=ride, sharer=request.user).exists()
     has_sharer = bool(RideShare.objects.filter(ride=ride))
@@ -173,7 +174,7 @@ def complete_view(request, pk):
     sharer_emails = [sharer.user.email for sharer in RideShare.objects.filter(ride=ride)]
     recipient_list = [ride.owner, ride.driver] + sharer_emails
     send_email(SUBJECT_RIDE_COMPLETED,
-               get_completed_body,
+               get_completed_body(request.user, ride),
                recipient_list)
     return redirect('ride_detail_view', pk=ride.pk)
 
@@ -205,7 +206,7 @@ def join_view(request, pk):
         ride.add_sharer(request.user, request.POST.get('passenger_count'))
         # Send email to owner
         send_email(SUBJECT_RIDE_JOINED,
-                   get_canceled_body(ride.owner, ride),
+                   get_joined_body(ride.owner, ride, request.user),
                    [ride.owner.email])
         return redirect('ride_join_success_view')
     return render(request, 'ride/join.html', {'passenger_count': passenger_count})
@@ -224,19 +225,20 @@ def confirm_view(request, pk):
     ride = get_object_or_404(Ride, pk=pk)
     # check if the user is a driver and the ride is open
     if driver and ride.status == RideStatusType.OPEN:
-        if ride.total_passengers <= driver.max_capacity:
+        if ride.total_passengers <= driver.max_capacity \
+                and ride.vehicle_type == driver.vehicle_type:
             # update the ride status and driver
             ride.status = RideStatusType.CONFIRMED
             ride.driver = driver
             ride.save()
             send_email(SUBJECT_RIDE_CONFIRMED,
-                       get_canceled_body(ride.owner, ride),
+                       get_confirmed_body(ride.owner, ride),
                        [ride.owner.email])
             messages.success(request, 'Order confirmed!')
         else:
             messages.error(request,
                            'The number of passengers for this ride exceeds the maximum number of passengers your '
-                           'registered vehicle can accommodate.')
+                           'registered vehicle can accommodate OR The vehicle type not match.')
     return redirect('ride_detail_view', pk=ride.pk)
 
 
