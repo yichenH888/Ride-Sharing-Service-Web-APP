@@ -69,8 +69,11 @@
             </tbody>
         </table>
 
-        {% if show_driver_btn %}
+        {% if show_confirm_btn %}
             <a class="btn btn-primary" href="{% url 'ride_confirm_view' pk=ride.pk %}">Confirm Ride</a>
+        {% endif %}
+        {% if show_complete_btn %}
+            <a class="btn btn-primary" href="{% url 'ride_complete_view' pk=ride.pk %}">Complete Ride</a>
         {% endif %}
         {% if show_owner_btn %}
             <a class="btn btn-primary" href="{% url 'ride_update_view' pk=ride.pk %}">Update Ride</a>

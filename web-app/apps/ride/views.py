@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import DriverRegisterForm, DriverUpdateForm, RideRequestForm, RideUpdateForm
 from .models import Driver, Ride, RideStatusType, RideShare
+from .utils import send_email, SUBJECT_RIDE_CANCELED, get_canceled_body, SUBJECT_RIDE_CONFIRMED, SUBJECT_RIDE_JOINED, \
+    SUBJECT_RIDE_COMPLETED, get_completed_body
 
 
 @login_required(login_url="/register/")
@@ -119,11 +121,14 @@ def detail_view(request, pk):
     has_sharer = bool(RideShare.objects.filter(ride=ride))
     sharers = RideShare.objects.filter(ride=ride)
 
-    show_driver_btn = is_driver \
-                      and not is_driver_for_this_ride \
-                      and ride.status == RideStatusType.OPEN \
-                      and not is_owner_for_this_ride \
-                      and not is_sharer_for_this_ride
+    show_confirm_btn = is_driver \
+                       and not is_driver_for_this_ride \
+                       and ride.status == RideStatusType.OPEN \
+                       and not is_owner_for_this_ride \
+                       and not is_sharer_for_this_ride
+    show_complete_btn = is_driver \
+                        and is_driver_for_this_ride \
+                        and ride.status == RideStatusType.CONFIRMED
     show_owner_btn = is_owner_for_this_ride \
                      and ride.status == RideStatusType.OPEN \
                      and not has_sharer
@@ -137,10 +142,25 @@ def detail_view(request, pk):
 
     return render(request, 'ride/detail.html', {'ride': ride,
                                                 'sharers': sharers,
-                                                'show_driver_btn': show_driver_btn,
+                                                'show_confirm_btn': show_confirm_btn,
+                                                'show_complete_btn': show_complete_btn,
                                                 'show_owner_btn': show_owner_btn,
                                                 'show_sharer_btn': show_sharer_btn,
                                                 'show_join_btn': show_join_btn})
+
+
+@login_required(login_url="/register/")
+def complete_view(request, pk):
+    ride = get_object_or_404(Ride, pk=pk)
+    ride.status = RideStatusType.COMPLETED
+    ride.save()
+    # Send email to all related users
+    sharer_emails = [sharer.user.email for sharer in RideShare.objects.filter(ride=ride)]
+    recipient_list = [ride.owner, ride.driver] + sharer_emails
+    send_email(SUBJECT_RIDE_COMPLETED,
+               get_completed_body,
+               recipient_list)
+    return redirect('ride_detail_view', pk=ride.pk)
 
 
 @login_required(login_url="/register/")
@@ -151,6 +171,11 @@ def cancel_view(request, pk):
         ride.remove_sharer(request.user)
     elif ride:
         ride.delete()
+    # Send email to user
+    send_email(SUBJECT_RIDE_CANCELED,
+               get_canceled_body(request.user, ride),
+               [request.user.email])
+
     return render(request, 'ride/cancel.html')
 
 
@@ -163,6 +188,10 @@ def join_view(request, pk):
 
     if request.method == 'POST':
         ride.add_sharer(request.user, request.POST.get('passenger_count'))
+        # Send email to owner
+        send_email(SUBJECT_RIDE_JOINED,
+                   get_canceled_body(ride.owner, ride),
+                   [ride.owner.email])
         return redirect('ride_join_success_view')
     return render(request, 'ride/join.html', {'passenger_count': passenger_count})
 
@@ -185,6 +214,9 @@ def confirm_view(request, pk):
         ride.status = RideStatusType.CONFIRMED
         ride.driver = driver
         ride.save()
+        send_email(SUBJECT_RIDE_CONFIRMED,
+                   get_canceled_body(ride.owner, ride),
+                   [ride.owner.email])
         messages.success(request, 'Order confirmed!')
     return redirect('ride_detail_view', pk=ride.pk)
 
@@ -202,32 +234,6 @@ def update_view(request, pk):
         form = RideUpdateForm(instance=ride)
     return render(request, 'ride/update.html', {'form': form})
 
-
-# @login_required(login_url="/register/")
-# def search_view(request):
-#     form = RideSearchForm(request.GET)
-#     rides = []
-#     if form.is_valid():
-#         if request.user.is_authenticated:
-#             if isinstance(request.user, Driver):
-#                 # 作为Driver的搜索范围
-#                 rides = Ride.objects.filter(
-#                     (Q(driver=request.user) | Q(sharable=True, status=RideStatusType.OPEN)) &
-#                     Q(destination__contains=form.cleaned_data['destination']) &
-#                     Q(arrive_time__gte=form.cleaned_data['arrive_time']) &
-#                     Q(vehicle_type=form.cleaned_data['vehicle_type']) &
-#                     Q(total_passengers__gte=form.cleaned_data['passengers_count'])
-#                 )
-#             else:
-#                 # 作为普通用户的搜索范围
-#                 rides = Ride.objects.filter(
-#                     (Q(owner=request.user) | Q(sharable=True, status=RideStatusType.OPEN)) &
-#                     Q(destination__contains=form.cleaned_data['destination']) &
-#                     Q(arrive_time__gte=form.cleaned_data['arrive_time']) &
-#                     Q(vehicle_type=form.cleaned_data['vehicle_type']) &
-#                     Q(total_passengers__gte=form.cleaned_data['passengers_count'])
-#                 )
-#     return render(request, 'ride/search.html', {'form': form, 'rides': rides})
 
 @login_required(login_url="/register/")
 def search_view(request):

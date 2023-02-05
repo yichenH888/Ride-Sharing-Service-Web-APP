@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import driver_view, request_view, request_success_view, my_rides_view, detail_view, confirm_view, \
-    update_view, cancel_view, join_view, join_success_view, search_view
+    update_view, cancel_view, join_view, join_success_view, search_view, complete_view
 
 urlpatterns = [
     path('driver/', driver_view, name='driver_view'),
@@ -12,6 +12,7 @@ urlpatterns = [
     path('<int:pk>/confirm/', confirm_view, name='ride_confirm_view'),
     path('<int:pk>/update/', update_view, name='ride_update_view'),
     path('<int:pk>/cancel', cancel_view, name='ride_cancel_view'),
+    path('<int:pk>/complete/', complete_view, name='ride_complete_view'),
     path('<int:pk>/join', join_view, name='ride_join_view'),
     path('join_success/', join_success_view, name='ride_join_success_view'),
     path('search/', search_view, name='ride_search_view'),
