@@ -1,0 +1,19 @@
+{% extends 'layouts/sidebar.html' %}
+
+{% block title %} RideConnect - Profile {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="user-info">
+        <h2 class="text-primary">User Information</h2>
+        <hr class="my-4">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+    </div>
+    <div class="actions">
+        <a class="btn btn-primary" href="{% url 'accounts_update_info_view' %}">Update Info</a>
+        <a class="btn btn-secondary" href="{% url 'accounts_change_password_view' %}">Change Password</a>
+    </div>
+{% endblock content %}

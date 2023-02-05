@@ -292,3 +292,4 @@ fabric.properties
 /web-app/apps/ride/migrations/
 /web-app/apps/home/migrations/
 /web-app/apps/authentication/migrations/
+/web-app/apps/accounts/migrations/

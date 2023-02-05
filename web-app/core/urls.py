@@ -20,6 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.authentication.urls')),  # Auth routes - login / register
     path('ride/', include('apps.ride.urls')),
+    path('account/', include('apps.accounts.urls')),
 
     path("", include("apps.home.urls"))
 ]
