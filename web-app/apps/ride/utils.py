@@ -28,6 +28,8 @@ def get_confirmed_body(user, ride):
            f"\n" \
            f"Your ride has been confirmed.\n" \
            f"Your driver: {ride.driver}\n" \
+           f"Plate #: {ride.driver.plate_number}\n" \
+           f"Contact: {ride.driver.user.email}\n" \
            f"\n" \
            f"Best regards,\n" \
            f"RideConnect"
