@@ -6,11 +6,12 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-    <h2 class="text-primary">Request a ride</h2>
-    <hr class="my-4">
-    <form method="post">
+    <h2 class="text-primary text-center my-4">Request a ride</h2>
+    <form method="post" class="mx-auto w-50">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Submit</button>
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
     </form>
 {% endblock content %}

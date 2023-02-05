@@ -50,15 +50,6 @@ class DriverUpdateForm(forms.ModelForm):
                   'vehicle_type']
 
 
-class RideSearchForm(forms.ModelForm):
-    class Meta:
-        model = Ride
-        fields = ['destination',
-                  'arrive_time',
-                  'vehicle_type',
-                  'passengers_count']
-
-
 class RideJoinForm(forms.ModelForm):
     class Meta:
         model = RideShare

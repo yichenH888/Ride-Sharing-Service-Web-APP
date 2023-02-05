@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import DriverRegisterForm, DriverUpdateForm, RideRequestForm, RideUpdateForm
@@ -84,17 +85,17 @@ def request_success_view(request):
 def my_rides_view(request):
     # Get the selected status from the query string
     status = request.GET.get('status')
-    driver = Driver.objects.filter(user=request.user).first()
 
     # Get all rides related to user
+    driver = Driver.objects.filter(user=request.user).first()
     sharerides = RideShare.objects.filter(sharer=request.user)
-    # [debug]
-    rides = Ride.objects.all()
-    # rides = Ride.objects.filter(Q(owner=request.user) |
-    #                             Q(driver=driver) |
-    #                             Q(rideshare__in=sharerides))
+    rides = Ride.objects.filter(Q(owner=request.user) |
+                                Q(driver=driver) |
+                                Q(rideshare__in=sharerides))
 
-    # rides += sharerides
+    # [debug] Show all the rides
+    # rides = Ride.objects.all()
+
     # Filter rides by status if the status is not "All"
     if status and status != 'all':
         rides = rides.filter(status=status)
@@ -142,16 +143,14 @@ def detail_view(request, pk):
                                                 'show_join_btn': show_join_btn})
 
 
-# todo)) fix ride.sharers -> RideShare
 @login_required(login_url="/register/")
 def cancel_view(request, pk):
     ride = get_object_or_404(Ride, pk=pk)
-    if ride.sharers.contains(request.user):
-        ride.sharers.remove(request.user)
-        ride.save()
+    is_sharer_for_this_ride = RideShare.objects.filter(ride=ride, sharer=request.user).exists()
+    if is_sharer_for_this_ride:
+        ride.remove_sharer(request.user)
     elif ride:
         ride.delete()
-        ride.save()
     return render(request, 'ride/cancel.html')
 
 
@@ -165,10 +164,6 @@ def join_view(request, pk):
     if request.method == 'POST':
         ride.add_sharer(request.user, request.POST.get('passenger_count'))
         return redirect('ride_join_success_view')
-    # else:
-    #     exist_rideshare = RideShare.objects.filter(ride=ride, sharer=request.user).first()
-    #     if exist_rideshare:
-    #         passenger_count = exist_rideshare.passenger_count
     return render(request, 'ride/join.html', {'passenger_count': passenger_count})
 
 
@@ -206,3 +201,66 @@ def update_view(request, pk):
     else:
         form = RideUpdateForm(instance=ride)
     return render(request, 'ride/update.html', {'form': form})
+
+
+# @login_required(login_url="/register/")
+# def search_view(request):
+#     form = RideSearchForm(request.GET)
+#     rides = []
+#     if form.is_valid():
+#         if request.user.is_authenticated:
+#             if isinstance(request.user, Driver):
+#                 # 作为Driver的搜索范围
+#                 rides = Ride.objects.filter(
+#                     (Q(driver=request.user) | Q(sharable=True, status=RideStatusType.OPEN)) &
+#                     Q(destination__contains=form.cleaned_data['destination']) &
+#                     Q(arrive_time__gte=form.cleaned_data['arrive_time']) &
+#                     Q(vehicle_type=form.cleaned_data['vehicle_type']) &
+#                     Q(total_passengers__gte=form.cleaned_data['passengers_count'])
+#                 )
+#             else:
+#                 # 作为普通用户的搜索范围
+#                 rides = Ride.objects.filter(
+#                     (Q(owner=request.user) | Q(sharable=True, status=RideStatusType.OPEN)) &
+#                     Q(destination__contains=form.cleaned_data['destination']) &
+#                     Q(arrive_time__gte=form.cleaned_data['arrive_time']) &
+#                     Q(vehicle_type=form.cleaned_data['vehicle_type']) &
+#                     Q(total_passengers__gte=form.cleaned_data['passengers_count'])
+#                 )
+#     return render(request, 'ride/search.html', {'form': form, 'rides': rides})
+
+@login_required(login_url="/register/")
+def search_view(request):
+    rides = []
+    driver = Driver.objects.filter(user=request.user).first()
+    if request.method == 'GET':
+        destination = request.GET.get('destination')
+        start_time = request.GET.get('start_time')
+        end_time = request.GET.get('end_time')
+        vehicle_type = request.GET.get('vehicle_type')
+        passengers_count = request.GET.get('passengers_count')
+
+        if destination or start_time or end_time or vehicle_type or passengers_count:
+            if driver:
+                # As a Driver's search scope
+                rides = Ride.objects.filter(
+                    (Q(status=RideStatusType.OPEN)) &
+                    (Q(destination__contains=destination) if destination else Q(destination__isnull=False)) &
+                    (Q(arrive_time__range=(start_time, end_time)) if start_time and end_time else Q(
+                        arrive_time__isnull=False)) &
+                    (Q(vehicle_type=vehicle_type) if vehicle_type else Q(vehicle_type__isnull=False)) &
+                    (Q(total_passengers__gte=passengers_count) if passengers_count else Q(
+                        total_passengers__isnull=False))
+                )
+            else:
+                # As a regular user's search scope
+                rides = Ride.objects.filter(
+                    (Q(owner=request.user) | Q(sharable=True, status=RideStatusType.OPEN)) &
+                    (Q(destination__contains=destination) if destination else Q(destination__isnull=False)) &
+                    (Q(arrive_time__range=(start_time, end_time)) if start_time and end_time else Q(
+                        arrive_time__isnull=False)) &
+                    (Q(vehicle_type=vehicle_type) if vehicle_type else Q(vehicle_type__isnull=False)) &
+                    (Q(total_passengers__gte=passengers_count) if passengers_count else Q(
+                        total_passengers__isnull=False))
+                )
+    return render(request, 'ride/search.html', {'rides': rides})

@@ -1,0 +1,82 @@
+{% extends 'layouts/sidebar.html' %}
+
+{% block title %} RideConnect - Search {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="container my-5">
+        <h2 class="text-primary">Ride Search</h2>
+        <hr class="my-4">
+        <form method="get">
+            <div class="form-group">
+                <label for="destination"><strong>Destination:</strong></label>
+                <input type="text" class="form-control" id="destination" name="destination">
+            </div>
+            <hr class="my-4">
+            <div class="form-group">
+                <label><strong>Arrive time range</strong></label>
+                <br>
+                <label for="arrive_time">Start:</label>
+                <input type="datetime-local" class="form-control" id="start_time" name="start_time">
+                <label for="arrive_time">End:</label>
+                <input type="datetime-local" class="form-control" id="end_time" name="end_time">
+            </div>
+            <hr class="my-4">
+            <div class="form-group">
+                <label for="vehicle_type"><strong>Vehicle Type:</strong></label>
+                <select class="form-control" id="vehicle_type" name="vehicle_type">
+                    <option value="">---</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="MPV">MPV</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="passengers_count"><strong>Passengers Count:</strong></label>
+                <input type="number" class="form-control" id="passengers_count" name="passengers_count">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+    <hr class="my-4">
+    {% if rides %}
+        <table class="table table-striped mt-3">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Owner</th>
+                <th>Driver</th>
+                <th>Sharable</th>
+                <th>Destination</th>
+                <th>Create Time</th>
+                <th>Arrive Time</th>
+                <th>Total Passengers</th>
+                <th>Vehicle Type</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ride in rides %}
+                <tr onclick="window.location='{% url 'ride_detail_view' ride.id %}'">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ ride.owner }}</td>
+                    <td>{{ ride.driver }}</td>
+                    <td>{{ ride.sharable }}</td>
+                    <td>{{ ride.destination }}</td>
+                    <td>{{ ride.create_time }}</td>
+                    <td>{{ ride.arrive_time }}</td>
+                    <td>{{ ride.total_passengers }}</td>
+                    <td>{{ ride.vehicle_type }}</td>
+                    <td>{{ ride.status }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No rides found.</p>
+    {% endif %}
+
+{% endblock content %}

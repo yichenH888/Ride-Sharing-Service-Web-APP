@@ -7,10 +7,10 @@
 
 {% block content %}
     <div class="container mt-3">
-        <h2 class="text-primary">Ride list</h2>
+        <h2 class="text-primary">My Rides</h2>
         <hr class="my-4">
         <!-- Filter Form -->
-        <p class="text-secondary">List of all the rides, choose a status to filter.</p>
+        <p class="text-secondary">List of all the related rides, choose a status to filter.</p>
         <form class="form-inline my-3">
             <div class="form-group mr-3">
                 <select class="form-control" onchange="location = this.value;">
@@ -31,7 +31,7 @@
                 </select>
             </div>
         </form>
-
+        {% if rides %}
         <table class="table table-striped mt-3">
             <thead>
             <tr>
@@ -64,5 +64,8 @@
             {% endfor %}
             </tbody>
         </table>
+        {% else %}
+            <p>No rides found.</p>
+        {% endif %}
     </div>
 {% endblock content %}
