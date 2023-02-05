@@ -6,7 +6,23 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import DriverRegisterForm, DriverUpdateForm, RideRequestForm, RideUpdateForm
 from .models import Driver, Ride, RideStatusType, RideShare
 from .utils import send_email, SUBJECT_RIDE_CANCELED, get_canceled_body, SUBJECT_RIDE_CONFIRMED, SUBJECT_RIDE_JOINED, \
-    SUBJECT_RIDE_COMPLETED, get_completed_body
+    SUBJECT_RIDE_COMPLETED, get_completed_body, SUBJECT_RIDE_CHANGED, get_changed_body
+
+
+def unregister_driver_helper(driver):
+    # Delete driver obj
+    driver.delete()
+    # Change related rides status
+    related_rides = Ride.objects.filter(driver=driver, status=RideStatusType.CONFIRMED)
+    for ride in related_rides:
+        ride.status = RideStatusType.OPEN
+        ride.save()
+        # Send emails to all related users
+        sharer_emails = [sharer.user.email for sharer in RideShare.objects.filter(ride=ride)]
+        recipient_list = [ride.owner] + sharer_emails
+        send_email(SUBJECT_RIDE_CHANGED,
+                   get_changed_body,
+                   recipient_list)
 
 
 @login_required(login_url="/register/")
@@ -32,9 +48,8 @@ def driver_view(request):
             if 'cancel' in request.POST:
                 return redirect('driver_view')
             # Handle the 'unregister' button press
-            # todo)) change all confirmed rides to open
             if 'unregister' in request.POST:
-                driver.delete()
+                unregister_driver_helper(driver)
                 return redirect('driver_view')
             form = DriverUpdateForm(request.POST, instance=driver)
             if form.is_valid():
@@ -208,16 +223,20 @@ def confirm_view(request, pk):
     # get the ride object
     ride = get_object_or_404(Ride, pk=pk)
     # check if the user is a driver and the ride is open
-    # todo)) check the number of passenger is satisfied
     if driver and ride.status == RideStatusType.OPEN:
-        # update the ride status and driver
-        ride.status = RideStatusType.CONFIRMED
-        ride.driver = driver
-        ride.save()
-        send_email(SUBJECT_RIDE_CONFIRMED,
-                   get_canceled_body(ride.owner, ride),
-                   [ride.owner.email])
-        messages.success(request, 'Order confirmed!')
+        if ride.total_passengers <= driver.max_capacity:
+            # update the ride status and driver
+            ride.status = RideStatusType.CONFIRMED
+            ride.driver = driver
+            ride.save()
+            send_email(SUBJECT_RIDE_CONFIRMED,
+                       get_canceled_body(ride.owner, ride),
+                       [ride.owner.email])
+            messages.success(request, 'Order confirmed!')
+        else:
+            messages.error(request,
+                           'The number of passengers for this ride exceeds the maximum number of passengers your '
+                           'registered vehicle can accommodate.')
     return redirect('ride_detail_view', pk=ride.pk)
 
 
@@ -229,6 +248,7 @@ def update_view(request, pk):
         form = RideUpdateForm(request.POST, instance=ride)
         if form.is_valid():
             ride = form.save()
+            ride.update_total_passengers()
             return redirect('ride_detail_view', pk=ride.pk)
     else:
         form = RideUpdateForm(instance=ride)

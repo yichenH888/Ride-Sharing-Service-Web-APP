@@ -6,6 +6,7 @@ SUBJECT_RIDE_CONFIRMED = "RideConnect - Ride Confirmed!"
 SUBJECT_RIDE_CANCELED = "RideConnect - Ride Canceled!"
 SUBJECT_RIDE_JOINED = "RideConnect - Ride Joined!"
 SUBJECT_RIDE_COMPLETED = "RideConnect - Ride Completed!"
+SUBJECT_RIDE_CHANGED = "RideConnect - Ride Changed!"
 
 
 def send_email(subject, message, recipient_list):
@@ -64,6 +65,21 @@ def get_completed_body(ride):
            f"\n" \
            f"Your ride has been completed.\n" \
            f"Ride Information: \n" \
+           f"Creat time: {ride.create_time}\n" \
+           f"Destination: {ride.destination}\n" \
+           f"Arrive time: {ride.arrive_time}\n" \
+           f"Total passengers: {ride.total_passengers}\n" \
+           f"\n" \
+           f"Best regards,\n" \
+           f"RideConnect"
+
+
+def get_changed_body(ride):
+    return f"Dear user,\n" \
+           f"\n" \
+           f"Your ride has been Changed.\n" \
+           f"Ride Information: \n" \
+           f"Creat time: {ride.driver}\n" \
            f"Creat time: {ride.create_time}\n" \
            f"Destination: {ride.destination}\n" \
            f"Arrive time: {ride.arrive_time}\n" \
