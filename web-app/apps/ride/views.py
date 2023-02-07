@@ -293,4 +293,10 @@ def search_view(request):
                     (Q(total_passengers__gte=passengers_count) if passengers_count else Q(
                         total_passengers__isnull=False))
                 )
+        else:
+            if driver:
+                rides = Ride.objects.filter(
+                    (Q(status=RideStatusType.OPEN)) &
+                    (Q(vehicle_type=driver.vehicle_type))
+                )
     return render(request, 'ride/search.html', {'rides': rides})
