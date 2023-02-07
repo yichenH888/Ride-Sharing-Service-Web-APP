@@ -6,5 +6,34 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-    <h1> Welcome {{ username }} </h1>
+    <div class="container mt-4">
+        <h2 class="text-primary">RideConnect</h2>
+        <hr class="my-4">
+        <h3 class="text-secondary">The system is designed to accommodate three user roles:</h3>
+        <p class="mt-3">- Ride Requester: A user who initiates a ride request.
+            <br>- Driver: A user who provides their name and vehicle information, and has the ability to claim, start,
+            confirm, and complete rides.
+            <br>- Ride Joiner: A user who searches for available rides and joins them as a passenger. </p>
+        <h3 class="text-secondary mt-4">Functionality supported: </h3>
+        <p class="mt-3">- Account creation and login for users.
+            <br>- Driver registration and information management
+            <br>-- Option to register as a driver
+            <br>-- Ability to enter and manage personal and vehicle information
+            <br>- Ride request
+            <br>-- Specify destination address, arrival date/time, number of passengers, vehicle type, whether ride may
+            be shared, and special requests
+            <br>-- Ability for ride owner to edit ride details before confirmation
+            <br>- Ride status and management
+            <br>-- View status of non-complete rides for owners and sharers
+            <br>--- Open rides display current details including updates from sharers
+            <br>--- Confirmed rides display driver and vehicle information
+            <br>-- View status of confirmed rides for drivers
+            <br>--- Display information for owners and sharers including passenger count
+            <br>-- Ability for drivers to mark rides as complete
+            <br>-- Search for open ride requests for drivers
+            <br>--- Claim and confirm rides
+            <br>-- Search for open ride requests for users by destination, arrival window, and passenger count
+            <br>-- Ability for sharers to join selected rides from search results
+        </p>
+    </div>
 {% endblock content %}
