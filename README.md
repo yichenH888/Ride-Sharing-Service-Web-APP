@@ -45,11 +45,12 @@ Lorem ipsum
 
 
 ## Usage example
-
-<div  align="center">   
+This is the homePage of the system after registration and logging in.
+![image](https://gitlab.oit.duke.edu/rs590/erss-hwk1-xl404-rs590/-/raw/master/homePage.png?inline=false)
+This screenshot indicate a ride which is shared by Kelly (Ride Owner) and Hunter (Ride Sharer), the Driver is Alisa. 
 ![image](https://gitlab.oit.duke.edu/rs590/erss-hwk1-xl404-rs590/-/raw/master/rideDetails.png?inline=false)
-<image src="./rideDetails.png" width = "150" height = "100" alt="rideDetails" align=center />
-</div>
+This ride is requested by Kelly in "Ride Request", and can be searched in the system by all the other users with relative information in "Ride Search". Hunter jolisa becomes the drivined the ride to become a ride sharer. As a driver who provided personal information and vehicle information in "Driver", Aer. All of this three users can find their ride in the "My Rides" Section. All the user can check and edit their personal information in "Profile".
+
 
 
 
