@@ -14,7 +14,7 @@
 
 > Django Web-App
 
-This web application provides a platform for users to request rides, offer rides, and join existing rides as passengers.   
+This web application provides a platform for users to request rides, offer rides, and join existing rides as passengers.     
 
 ## Features
 
