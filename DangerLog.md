@@ -1,19 +1,39 @@
 <h1 align="center">
     DangerLog
 </h1>
+## Input validation
 
-1.  
-- Bugs: Ride Sharers cannot receive notification e-mail when drivers confirm a ride, only ride owners can receive the e-mail.
-- How To Handle: When the e-mail address is wrong or too much e-mails are sent, e-mails cannot be sent as expected. Thus, errors related to sending e-mails were caught, and set not to influence program running even if they actually existing.
+The system should handle cases where the user inputs incorrect or invalid information while creating an account, registering as a driver, or requesting a ride. This could lead to unexpected behavior or failure to perform a task.
 
-2.  
-- Bugs: The "Create Time" generated automatically does not match with time in Durham.
-- How To Handle: The reason might be the time zone of server is not the time zone in Durham. It is not easy to handle the problem only if we can modify the setted time zone of server.
+**Solutions:** Using Django `Form` to collect users input and `Form.cleaned_data` get the valid data.
 
-3.  
-- Bugs: The system does not check the correctness of e-mail address, so user may not be able to receiver notification with wrong e-mail address.
-- How To Handle: Add functionalities in authentification process to avoid missing notification.
+## Authentication and security
 
-4.  
-- Bugs: Users can register for different accounts with the same e-mail address.
-- How to Handle: This fact can lead to some chaos in identificaton management. More authentification about avoiding reusing of e-mail address should be added.
+The system should handle cases where a user's login credentials are incorrect or if the user's session is compromised. This could lead to unauthorized access to sensitive information or unauthorized changes to the user's account.
+
+**Solutions:** Using Django User and authentication.
+
+## Ride management
+
+The system should handle cases where the driver claims a ride but is unable to start or complete it, or if the ride requester cancels the ride. This could lead to inconsistent ride status updates and confusion for other users.
+
+**Solutions:** As the Owner of a Ride, you can update the Ride information or cancel the Ride before it is confirmed or a Sharer joins. As a Sharer, you can modify the number of people in the Rideshare or cancel your join before the Ride is confirmed.
+
+## Ride sharing 
+
+The system should handle cases where a ride joiner joins a ride that has already been filled to capacity or if the ride requester changes the number of passengers after a ride has been shared. This could lead to disappointment for ride joiners and frustration for ride requesters.
+
+**Solutions: **A driver can only confirm a Ride where the number of passengers required is less than the maximum number of passengers their registered vehicle can carry. Before the driver accepts the order, the Sharer can update the number of people joining.
+
+## Ride Info
+
+Bugs: The automatically generated "Create Time" does not match the time in Durham.
+
+Solutions: The issue may be due to the server's time zone not being set to the time zone in Durham. The problem cannot be easily resolved unless the server's time zone can be changed.
+
+## Email
+
+Bugs: Sending multiple emails to non-existent email addresses will result in the email account being locked and unable to send further emails.
+
+Solutions: Setting up own email server is a potential solution, however, it exceeds the requirements of this assignment.
+
