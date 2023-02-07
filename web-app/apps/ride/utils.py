@@ -1,3 +1,5 @@
+from smtplib import SMTPDataError
+
 from django.conf import settings
 from django.core.mail import send_mail
 
@@ -10,13 +12,20 @@ SUBJECT_RIDE_CHANGED = "RideConnect - Ride Changed!"
 
 
 def send_email(subject, message, recipient_list):
-    send_mail(
-        subject,
-        message,
-        settings.EMAIL_HOST_USER,
-        recipient_list,
-        fail_silently=False,
-    )
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            recipient_list,
+            fail_silently=False,
+        )
+    except SMTPDataError as e:
+        # Handle the error
+        print("SMTP Data Error:", e)
+    except Exception as e:
+        # Handle other exceptions
+        print("Error:", e)
 
 
 def get_registered_body(user):

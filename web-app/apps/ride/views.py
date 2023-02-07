@@ -173,7 +173,7 @@ def complete_view(request, pk):
     ride.status = RideStatusType.COMPLETED
     ride.save()
     # Send email to all related users
-    sharer_emails = [sharer.user.email for sharer in RideShare.objects.filter(ride=ride)]
+    sharer_emails = [rideshare.sharer.email for rideshare in RideShare.objects.filter(ride=ride)]
     recipient_list = [ride.owner, ride.driver] + sharer_emails
     send_email(SUBJECT_RIDE_COMPLETED,
                get_completed_body(ride),
