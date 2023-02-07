@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-)g)az1-r)nl4&_seag79pv-hq@%!+p4$^l#l52$b0^t8yz@2-d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['web']
 
 # Application definition
 
@@ -78,13 +78,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'RideConnectDB',
-        'USER': 'RideConnect',
-        'PASSWORD': '#O-H0s_c1Q=cHeG+KOKe',
-        'HOST': '',
-        'PORT': '5432',
-    }
-}
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
+    }}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -141,3 +140,5 @@ EMAIL_USE_SSL = False
 
 EMAIL_HOST_USER = 'rideconnect_duke@outlook.com'
 EMAIL_HOST_PASSWORD = 'piFfed-zeqmo7-juggir'
+
+CSRF_TRUSTED_ORIGINS = ['http://*.vm.duke.edu:8000', 'http://*.127.0.0.1:8000', 'http://localhost:8000']
