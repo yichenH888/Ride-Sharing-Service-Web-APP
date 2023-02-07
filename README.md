@@ -17,9 +17,9 @@
 Ride Sharing Service: This web-app will let users request, drive for, and join rides. 
 
 The system allows three roles:  
-- Ride Owner: A user who requests a ride 
-- Driver: Provide name and vehicle information; Can claim, start, confirm and complete ride service
-- Ride Sharer: Can search ride request and join the ride
+- Ride Owner: A user who requests a ride.
+- Driver: Provide name and vehicle information; Can claim, start, confirm and complete ride service.
+- Ride Sharer: Can search ride request and join the ride.
 
 Functionality supported: 
 
@@ -49,7 +49,7 @@ This is the homePage of the system after registration and logging in.
 ![image](https://gitlab.oit.duke.edu/rs590/erss-hwk1-xl404-rs590/-/raw/master/homePage.png?inline=false)
 This screenshot indicate a ride which is shared by Kelly (Ride Owner) and Hunter (Ride Sharer), the Driver is Alisa. 
 ![image](https://gitlab.oit.duke.edu/rs590/erss-hwk1-xl404-rs590/-/raw/master/rideDetails.png?inline=false)
-This ride is requested by Kelly in "Ride Request", and can be searched in the system by all the other users with relative information in "Ride Search". Hunter jolisa becomes the drivined the ride to become a ride sharer. As a driver who provided personal information and vehicle information in "Driver", Aer. All of this three users can find their ride in the "My Rides" Section. All the user can check and edit their personal information in "Profile".
+This ride is requested by Kelly in "Ride Request", and can be searched in the system by all the other users with relative information in "Ride Search". Hunter joined the ride to become a ride sharer. As a driver who provided personal information and vehicle information in "Driver", Alisa becomes the driver. All of this three users can find their ride in the "My Rides" Section. All the user can check and edit their personal information in "Profile".
 
 
 
