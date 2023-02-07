@@ -46,7 +46,10 @@ Lorem ipsum
 
 ## Usage example
 
+<div  align="center">   
 ![image](https://gitlab.oit.duke.edu/rs590/erss-hwk1-xl404-rs590/-/raw/master/rideDetails.png?inline=false)
+<image src="./rideDetails.png" width = "300" height = "200" alt="rideDetails" align=center />
+</div>
 
 
 
